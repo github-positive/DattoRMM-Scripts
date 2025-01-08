@@ -165,7 +165,7 @@ if (-not $logFileData -or $logFileData.Count -eq 0) {
                         $logData = $logEntry | ConvertFrom-Json -ErrorAction Stop
                         # Iterate through each JSON object in the array
                         $logData | ForEach-Object {
-                            if ((-not ($_.Message -eq "No logged-on users.")) -and (-not (Test-IsExcluded -username $_.Username))) {
+                            if ((-not ($_.Message -eq "No logged-on users.")) -and ($_.state -eq "Active") -and (-not (Test-IsExcluded -username $_.Username))) {
                                 $script:foundNonExcludedUsersLogonWithin30Days = $true
                             }
                         }
