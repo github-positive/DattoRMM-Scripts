@@ -20,7 +20,12 @@ $SQLLiteOldPath = "$env:ProgramData\System.Data.SQLite-Old.dll"
 $alertThreshold = (Get-Date).AddDays(-1)
 $diagMessages = @()
 
-if ((Test-Path $SQLLitePath) -and (Test-Path $SQLLiteOldPath)) {
+$SQLLitePresent = (Test-Path $SQLLitePath -ErrorAction SilentlyContinue)
+$SQLLiteOldPresent = (Test-Path $SQLLiteOldPath -ErrorAction SilentlyContinue)
+$SQLLiteSize = ((Get-Item $SQLLitePath -ErrorAction SilentlyContinue).Length )
+$SQLLiteOldSize = ((Get-Item $SQLLiteOldPath -ErrorAction SilentlyContinue).Length )
+
+if ($SQLLitePresent -and $SQLLiteOldPresent -and ($SQLLiteSize -ge 1024000) -and ($SQLLiteOldSize -ge 1024000) ) {
     try {
         add-type -path $SQLLitePath
     }
