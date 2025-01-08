@@ -19,6 +19,13 @@ $DiagMessages = @()
 $AlertMessage = ""
 $ExitCode = 0
 
+if ((Get-Item $SQLLitePath -ErrorAction SilentlyContinue).Length -lt 1024000 ) {
+    Remove-Item $SQLLitePath -Force -ErrorAction SilentlyContinue
+}
+if ((Get-Item $SQLLiteOldPath -ErrorAction SilentlyContinue).Length -lt 1024000 ) {
+    Remove-Item $SQLLiteOldPath -Force -ErrorAction SilentlyContinue
+}
+
 if (!(Test-Path $SQLLitePath)) {
     try {
         Invoke-WebRequest -Uri $SQLLiteDownloadUrl -OutFile $SQLLitePath -UseBasicParsing -ErrorAction SilentlyContinue
