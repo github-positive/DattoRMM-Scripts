@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Drawing
 
 # Form Box
 $form = New-Object System.Windows.Forms.Form
-$form.Size = New-Object System.Drawing.Size(400, 350)  # Width/Height.
+$form.Size = New-Object System.Drawing.Size(400, $ENV:box_Hight)  # Width/Height.
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::Manual
 $form.Location = New-Object System.Drawing.Point(([System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea.Width - $form.Width), ([System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea.Height - $form.Height))
 $form.TopMost = $true  # Set to true to ensure the form stays on top
@@ -18,7 +18,7 @@ $logoPictureBox.SizeMode = [System.Windows.Forms.PictureBoxSizeMode]::CenterImag
 
 # Header
 $headerLabel = New-Object System.Windows.Forms.Label
-$headerLabel.Text = "Header text"
+$headerLabel.Text = $ENV:header_text
 $headerLabel.AutoSize = $true
 $headerLabel.Font = New-Object System.Drawing.Font("Arial", 12, [System.Drawing.FontStyle]::Bold)
 $headerLabel.Location = New-Object System.Drawing.Point(([System.Math]::Round(($form.Width - $headerLabel.PreferredWidth) / 2)), 60)
@@ -61,9 +61,9 @@ $buttonEffectiveTop = $form.Height - $closeButton.Height - 50 - $buttonTopMargin
 
 # Message
 $bodyLabel = New-Object System.Windows.Forms.Label
-$bodyLabel.Text = "message text"
+$bodyLabel.Text = $ENV:message_text
 $bodyLabel.AutoSize = $false  # Set AutoSize to false as we set it static to not overlap on the button and header
-$bodyLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Regular) 
+$bodyLabel.Font = New-Object System.Drawing.Font("Arial", $ENV:message_font_size, [System.Drawing.FontStyle]::Regular) 
 $bodyLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
 $bodyLabel.Location = New-Object System.Drawing.Point(10, ($headerBottom + 10))
 $bodyLabel.Height = $buttonEffectiveTop - $bodyLabel.Location.Y - 10  # Calculate space available for bodyLabel
