@@ -25,7 +25,7 @@ $sites = @(
 )
 $currentUser = whoami 2>$null
 $results = "User: $currentUser. "
-$ufdNumber = "14"
+$ufdNumber = "13"
 foreach ($site in $sites) {
     #Write-Host "Testing, Category: $($site.Category), URL: $($site.URL)"
     $isAccessible = Test-SiteAccess -url $site.URL
@@ -42,7 +42,7 @@ Write-Host "====================================================================
 Write-Host "Results: $results"
 Write-Host "======================================================================================"
 try {
-    #Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$ufdNumber" -PropertyType String -Value $results -Force | Out-Null
+    Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$ufdNumber" -PropertyType String -Value $results -Force | Out-Null
     Write-Host "UDF $ufdNumber has been set."
 }
 catch {
