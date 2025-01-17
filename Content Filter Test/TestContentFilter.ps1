@@ -1,4 +1,3 @@
-#Test Content Filtering
 function Test-SiteAccess ($url) {
     try{
         $headers = @{
@@ -16,6 +15,31 @@ function Test-SiteAccess ($url) {
         return $false
     }
 }
+
+# Create/set the log file
+try {
+    $logFolderPath = Join-Path -Path $env:ProgramData -ChildPath "Positive"
+    $logFilePath = Join-Path -Path $logFolderPath -ChildPath "ContentFilteringStatus.log"
+    $logRetentionDays = 90
+
+    if (-Not (Test-Path -Path $logFolderPath)) {
+        New-Item -Path $logFolderPath -ItemType Directory -Force | Out-Null
+    }
+    if (-Not (Test-Path -Path $logFilePath)) {
+        New-Item -Path $logFilePath -ItemType File -Force | Out-Null
+    }
+} catch {
+    Write-Host "Error setting up log file: $_"
+    exit 1
+}
+
+# Add current user info
+$currentUser = whoami 2>$null
+$results = @{
+    User = $currentUser
+}
+
+# Test Content Filter Status
 $sites = @(
     @{ URL = "instagram.com"; Category = "Social Media" }
     @{ URL = "zappos.com"; Category = "Shopping" }
@@ -23,9 +47,6 @@ $sites = @(
     @{ URL = "disneyplus.com"; Category = "Entertainment" }
     @{ URL = "porn.com"; Category = "Adult Content" }
 )
-$currentUser = whoami 2>$null
-$results = "User: $currentUser. "
-$ufdNumber = "13"
 foreach ($site in $sites) {
     #Write-Host "Testing, Category: $($site.Category), URL: $($site.URL)"
     $isAccessible = Test-SiteAccess -url $site.URL
@@ -36,16 +57,48 @@ foreach ($site in $sites) {
     } else {
         "Unknown"
     }
-    $results += "$($site.Category) is $status. "
+    $results[$site.Category] = $status
 }
+$JsonOutput = $results | ConvertTo-Json -Depth 2 -Compress
 Write-Host "======================================================================================"
-Write-Host "Results: $results"
+Write-Host "Results: $JsonOutput"
 Write-Host "======================================================================================"
+
+# Write the results to the log file
 try {
-    Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$ufdNumber" -PropertyType String -Value $results -Force | Out-Null
-    Write-Host "UDF $ufdNumber has been set."
+    $currentDateTime = Get-Date -Format "MM-dd-yyyy HH:mm:ss"
+    Add-Content -Path $logFilePath -Value "$currentDateTime - $JsonOutput"
 }
 catch {
-    Write-Host "Error writing UDF. Error $_"
+    Write-Host "Error writing the results to the log file. Error $_"
     exit 1
 }
+
+### Clean up old logs ###
+
+$retentionThreshold = (Get-Date).AddDays(-$logRetentionDays)
+$tempFilePath = "$logFilePath.tmp"
+$logFileData = Get-Content -Path $logFilePath
+foreach ($line in $logFileData) {
+
+    # Attempt to extract the date from each line (assuming the format: MM-dd-yyyy HH:mm:ss)
+    if ($line -match "^(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})") {
+        $logDate = Get-Date $matches[1] -ErrorAction SilentlyContinue
+
+        # Check if the log date is older than the retention threshold
+        if ($logDate -and ($logDate -lt $retentionThreshold)) {
+            # Skip this line (older than retention period)
+            continue
+        } else {
+            Add-Content -Path $tempFilePath -Value $line
+        }
+    } else {
+        Add-Content -Path $tempFilePath -Value $line
+    }
+}
+
+# Replace the original log file with the cleaned temporary file
+if (Test-Path -Path $tempFilePath) {
+    Move-Item -Path $tempFilePath -Destination $logFilePath -Force
+}
+### END Clean up old logs ###
