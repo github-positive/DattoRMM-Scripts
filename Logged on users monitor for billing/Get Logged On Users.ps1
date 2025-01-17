@@ -72,7 +72,7 @@ function Test-IsValidJson {
 ### general variables
 $diagMessages = @()
 $success = $true
-$ufdNumber = "14"
+$udfNumber = "14"
 $approvedUdfValues = @("No login for 30 days","Complimentary Device", "Discounted Device")
 
 # Create/set the log file
@@ -142,7 +142,7 @@ if (-not $logFileData -or $logFileData.Count -eq 0) {
 
     ### Review the logs and set the UDF ###
     try {
-        $currentUdfValue = (Get-Item "ENV:\UDF_$ufdNumber").value
+        $currentUdfValue = (Get-Item "ENV:\UDF_$udfNumber").value
         $cutoffDate = (Get-Date).AddDays(-30)
         $foundNonExcludedUsersLogonWithin30Days = $false
         $logsFoundWithin30Days = $false
@@ -176,14 +176,14 @@ if (-not $logFileData -or $logFileData.Count -eq 0) {
 
         if ($currentUdfValue -eq "No login for 30 days"){
             if ($foundNonExcludedUsersLogonWithin30Days) {
-                Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$ufdNumber" -Value $null -Force | Out-Null
+                Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$udfNumber" -Value $null -Force | Out-Null
             }
         } elseif ([string]::IsNullOrEmpty($currentUdfValue) ) {
             if (($foundNonExcludedUsersLogonWithin30Days -eq $false) -and $logsFoundWithin30Days -and $oldestLogTimestamp -and ($oldestLogTimestamp -lt $cutoffDate) ) {
-                Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$ufdNumber" -PropertyType String -Value "No login for 30 days" -Force | Out-Null
+                Set-ItemProperty "HKLM:\Software\CentraStage" -Name "Custom$udfNumber" -Value "No login for 30 days" -Force | Out-Null
             }
         } elseif ($currentUdfValue -notin $approvedUdfValues) {
-            $diagMessages += "Warning! there is non-approved data in UDF $ufdNumber so the system can't set the correct billing information."
+            $diagMessages += "Warning! there is non-approved data in UDF $udfNumber so the system can't set the correct billing information."
             $success = $false
         }
         
