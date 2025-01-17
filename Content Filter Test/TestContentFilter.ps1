@@ -68,6 +68,7 @@ Write-Host "====================================================================
 try {
     $currentDateTime = Get-Date -Format "MM-dd-yyyy HH:mm:ss"
     Add-Content -Path $logFilePath -Value "$currentDateTime - $JsonOutput"
+    Write-Host "Results has been added to the log file."
 }
 catch {
     Write-Host "Error writing the results to the log file. Error $_"
