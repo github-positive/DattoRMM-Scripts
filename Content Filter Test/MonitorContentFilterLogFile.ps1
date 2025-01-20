@@ -17,9 +17,9 @@ $expectedBlockedCategories = $ENV:expectedBlockedCategories
 if ($expectedBlockedCategories.Length -lt 1){
     $expectedBlockedCategories = "Adult Content"
 }
-$supportedBlockedCategories = "Social Media,Shopping,News,Entertainment,Adult Content"
 $expectedBlockedCategoriesArray = $expectedBlockedCategories -split ','
-$supportedBlockedCategoriesArray = $supportedBlockedCategories -split ','
+#$supportedBlockedCategories = "Social Media,Shopping,News,Entertainment,Adult Content"
+#$supportedBlockedCategoriesArray = $supportedBlockedCategories -split ','
 
 $alert = $false
 $diagMessages = @()
@@ -28,8 +28,8 @@ $udfNumber = "13"
 
 # Check if the log file exists
 if (-Not (Test-Path -Path $logFilePath)) {
-    Write-Host "Log file not found: $logFilePath"
-    #exit 1
+    write-DRRMAlert "Log file not found: $logFilePath"
+    exit 0
 } else{
 
     # Read the latest log entry from the log file
@@ -64,12 +64,12 @@ if (-Not (Test-Path -Path $logFilePath)) {
             $results += "`nFor exclusions see https://positivecomputers.itglue.com/2538598/docs/18348433#id-bba8bb25-c3d8-4ba7-887f-5c0a5a73a41e"
             $diagMessages += $results
         } else {
-            Write-Host "No valid JSON found in the latest log entry."
-            #exit 1
+            write-DRRMAlert "No valid JSON found in the latest log entry."
+            exit 1
         }
     } catch {
-        Write-Host "Error processing the log file or writing the UDF. Error: $_"
-        #exit 1
+        write-DRRMAlert "Error processing the log file or writing the UDF. Error: $_"
+        exit 1
     }
 }
 
