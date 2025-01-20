@@ -61,6 +61,7 @@ if (-Not (Test-Path -Path $logFilePath)) {
                 }
             }
             $results += "`nCurrent expected blocked categories: $expectedBlockedCategories"
+            $results += "`nLatest results log: $latestLogLine"
             $results += "`nFor exclusions see https://positivecomputers.itglue.com/2538598/docs/18348433#id-bba8bb25-c3d8-4ba7-887f-5c0a5a73a41e"
             $diagMessages += $results
         } else {
