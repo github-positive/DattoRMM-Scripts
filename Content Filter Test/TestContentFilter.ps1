@@ -59,6 +59,37 @@ foreach ($site in $sites) {
     }
     $results[$site.Category] = $status
 }
+
+# Find Geder or Meshimer Filter ID from the HTML content (if available)
+$GederID = ""
+$MeshimerID = ""
+
+try {
+    $response = Invoke-WebRequest -Uri "https://www.777.com" -Method Get
+    $content = $response.Content
+
+    # Check if the content contains Geder
+    if ($content -match 'https://blocker\.geder\.org/info\?user=([^&]+)') {
+        $GederID = $matches[1]
+    }
+    
+    # Check if the content contains Meshimer
+    if ($content -match '<textarea name="User" id="User_Header"[^>]*>Your Meshimer User ID is</textarea>\s*<textarea name="User" id="UserInfo"[^>]*>(\d+)</textarea>') {
+        $MeshimerID = $matches[1]
+    }
+} catch {
+    Write-Host "Error extracting Geder or Meshimer ID. Error: $_"
+}
+
+# Store the extracted user ID (if any) in the results
+if ($GederID) {
+    $results["GederID"] = $GederID
+}
+if ($MeshimerID) {
+    $results["MeshimerID"] = $MeshimerID
+}
+
+# Set the output
 $JsonOutput = $results | ConvertTo-Json -Depth 2 -Compress
 Write-Host "======================================================================================"
 Write-Host "Results: $JsonOutput"
@@ -68,9 +99,8 @@ Write-Host "====================================================================
 try {
     $currentDateTime = Get-Date -Format "MM-dd-yyyy HH:mm:ss"
     Add-Content -Path $logFilePath -Value "$currentDateTime - $JsonOutput"
-    Write-Host "Results has been added to the log file."
-}
-catch {
+    Write-Host "Results have been added to the log file."
+} catch {
     Write-Host "Error writing the results to the log file. Error $_"
     exit 1
 }
