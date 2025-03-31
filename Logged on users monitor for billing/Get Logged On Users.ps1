@@ -159,7 +159,7 @@ if (-not $logFileData -or $logFileData.Count -eq 0) {
 
                 # Check if the log entry date is within the past 30 days
                 if ($logTimestamp -ge $cutoffDate) {
-                    if(Test-IsValidJson -InputLine $line) {
+                    if(Test-IsValidJson -InputLine $logEntry) {
                         $logsFoundWithin30Days = $true  # Mark that at least one log entry exists in the past 30 days
 
                         $logData = $logEntry | ConvertFrom-Json -ErrorAction Stop
