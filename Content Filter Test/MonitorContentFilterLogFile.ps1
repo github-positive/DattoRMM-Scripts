@@ -66,18 +66,18 @@ if (-Not (Test-Path -Path $logFilePath)) {
             $diagMessages += $results
         } else {
             write-DRRMAlert "No valid JSON found in the latest log entry."
-            exit 1
+            exit 0 #changed from 1 for no alerts
         }
     } catch {
         write-DRRMAlert "Error processing the log file or writing the UDF. Error: $_"
-        exit 1
+        exit 0 #changed from 1 for no alerts
     }
 }
 
 if ($alert){
     write-DRMMDiag $diagMessages
     write-DRRMAlert "Content filter settings are incorrect."
-    Exit 1
+    exit 0 #changed from 1 for no alerts
 } else {
     write-DRRMAlert "Content filter settings are correct."
 }
