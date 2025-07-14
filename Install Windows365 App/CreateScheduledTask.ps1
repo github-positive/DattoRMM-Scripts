@@ -25,14 +25,19 @@ if (-not (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue)) 
         # Define the action (run PowerShell script)
         $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
 
+        # Create task settings with no power restrictions
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+
         # Register the task under the current user
-        Register-ScheduledTask -TaskName $taskName -Trigger $trigger -Action $action -User $env:USERNAME -RunLevel LeastPrivilege
+        Register-ScheduledTask -TaskName $taskName -Trigger $trigger -Action $action -Settings $settings -User "SYSTEM" -RunLevel Limited |Out-Null
+        Write-Output "Scheduled task '$taskName' created successfully."
+        #exit 0
     }
     catch {
         Write-Output "Failed to create scheduled task: $_"
-        exit 1
+        #exit 1
     }
 } else {
     Write-Output "Scheduled task '$taskName' already exists."
-    exit 0
+    #exit 0
 }
